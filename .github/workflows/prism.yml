@@ -194,17 +194,34 @@ jobs:
           path: /var/cache/apt/archives
           key: ${{ runner.os }}-apt-rclone-fuse3-expect
           
-        
-      # === 依赖安装（原步骤） ===
-      - name: Install Dependencies (unzip, rclone, fuse3)
+      - name: Parallel Install Dependencies (expect, rclone, fuse3)
         id: step_deps
         continue-on-error: true
         run: |
-          # 1. 极速安装 expect 和 fuse3（不更新软件源，直接利用本地已有索引安装）
-          sudo apt-get install -y --no-install-recommends expect fuse3
+          # 1. 在后台（&）异步启动 rclone 官方脚本下载并安装，不占用主线程时间
+          echo "🚀 [Rclone] 后台开始下载与安装..."
+          (sudo curl -fsSL https://rclone.org/install.sh | sudo bash > /tmp/rclone_install.log 2>&1 &)
+          RCLONE_PID=$! # 记录 Rclone 任务的进程 ID
           
-          # 2. 绕过 apt，直接从预编译好的官方渠道拉取最新版 rclone 二进制（速度极快）
-          sudo curl -fsSL https://rclone.org/install.sh | sudo bash
+          # 2. 主线程同时利用多线程（-o APT::Keep-Downloaded-Packages=true）极速下载并安装系统依赖
+          echo "📦 [Apt] 开始安装系统依赖 (expect, fuse3)..."
+          sudo apt-get install -y -q --no-install-recommends \
+            -o Acquire::ForceIPv4=true \
+            expect fuse3
+          
+          # 3. 等待 Rclone 后台任务结束
+          echo "⏳ 正在等待 Rclone 异步安装完成..."
+          wait $RCLONE_PID
+          
+          # 4. 检查 Rclone 安装结果，若失败则打印日志
+          if [ $? -ne 0 ]; then
+            echo "❌ Rclone 安装失败，错误日志如下："
+            cat /tmp/rclone_install.log
+            exit 1
+          else
+            echo "✅ 所有依赖（expect, rclone, fuse3）全部并行安装成功！"
+          fi
+       
           
       # === 依赖安装（重试步骤，仅在失败时触发） ===
       - name: Install Dependencies (unzip, rclone, fuse3) - Retry
