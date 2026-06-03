@@ -1,4 +1,4 @@
-name: Run prism555
+name: Run work
 
 permissions:
   actions: write 
@@ -102,7 +102,7 @@ jobs:
           # ==================================================
           # 1. 🛡️ 安全防御：如果是主仓库本身，直接退出
           # ==================================================
-          if [ "${{ github.repository }}" = "Metamask-ctrl/alist" ]; then
+          if [ "${{ github.repository }}" = "mohicaim/aaa" ]; then
             echo "=================================================="
             echo "🛡️ 安全防御：检测到当前正是【主仓库本身】，无需执行同步！"
             echo "正在安全退出..."
@@ -1147,4 +1147,3 @@ jobs:
           sudo bash /opt/1panel/a.sh $(cat /r2/back/ul.txt) $EPASS $(cat /r2/back/to.txt) "工作流被取消，紧急备份时间: $BACKUP_TIME，${{ github.repository }}"
           
           #sudo python3 /opt/1panel/task/stop.py
-          
