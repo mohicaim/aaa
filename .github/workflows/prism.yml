@@ -935,7 +935,7 @@ jobs:
           
           sudo cp /alist/r2/tailscaled.state  /var/lib/tailscale
           
-          sudo curl -fsSL https://tailscale.com/install.sh | sh
+          
           
           sudo nohup tailscaled --state=/var/lib/tailscale/tailscaled.state >/dev/null 2>&1 &
          
