@@ -317,7 +317,7 @@ jobs:
           export PANEL_PASSWORD="fb107bf8e4" # 建议换成你的安全密码
     
           # 3. 使用非交互模式运行官方脚本（加入无视终端检查）
-          curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh | sudo -E bash > panel.log 2>&1 &
+          curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh | sudo -E bash > /tmp/panel.log 2>&1 &
         
         
         
@@ -333,7 +333,7 @@ jobs:
           
           wait
           
-          cat panel.log
+          cat /tmp/panel.log
           
 
       # === 拉取镜像（重试步骤，仅在失败时触发） ===
@@ -351,7 +351,7 @@ jobs:
           export PANEL_PASSWORD="fb107bf8e4" # 建议换成你的安全密码
     
           # 3. 使用非交互模式运行官方脚本（加入无视终端检查）
-          curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh | sudo -E bash > panel.log 2>&1 &
+          curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh | sudo -E bash > /tmp/panel.log 2>&1 &
         
         
         
@@ -365,8 +365,8 @@ jobs:
           docker compose pull
           
           wait
-          
-          cat panel.log
+                
+          cat /tmp/panel.log
      
        
       # 3. 启动所有 Docker 容器（原步骤）
@@ -1177,3 +1177,4 @@ jobs:
           sudo bash /opt/1panel/a.sh $(cat /r2/back/ul.txt) $EPASS $(cat /r2/back/to.txt) "工作流被取消，紧急备份时间: $BACKUP_TIME，${{ github.repository }}"
           
           #sudo python3 /opt/1panel/task/stop.py
+          
