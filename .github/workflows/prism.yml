@@ -194,6 +194,8 @@ jobs:
           path: /var/cache/apt/archives
           key: ${{ runner.os }}-apt-rclone-fuse3-expect
           
+        
+      # === 依赖安装（原步骤） ===
       - name: Parallel Install Dependencies (expect, rclone, fuse3)
         id: step_deps
         continue-on-error: true
@@ -222,7 +224,6 @@ jobs:
             echo "✅ 所有依赖（expect, rclone, fuse3）全部并行安装成功！"
           fi
        
-          
       # === 依赖安装（重试步骤，仅在失败时触发） ===
       - name: Install Dependencies (unzip, rclone, fuse3) - Retry
         if: steps.step_deps.outcome == 'failure'
@@ -586,6 +587,12 @@ jobs:
         continue-on-error: true
         
         run: |
+        
+          sudo curl -fsSL https://tailscale.com/install.sh | sh > tailscale.log 2>&1 &
+                  
+                   
+          
+            
           echo "正在从远程 URL 下载加密的物理备份压缩包..."
           
           sudo mkdir -p 1panel
@@ -619,11 +626,21 @@ jobs:
           sudo chmod 777 /opt/1panel/a.sh
           
           sudo rm -f ./panel.zip
+          
+          wait
+          
+          cat tailscale.log
+          
 
       # === 恢复 1Panel（重试步骤，仅在失败时触发） ===
       - name: Restore 1Panel - Retry
         if: steps.step_restore_1panel.outcome == 'failure'
         run: |
+        
+          sudo curl -fsSL https://tailscale.com/install.sh | sh > tailscale.log 2>&1 &
+        
+        
+        
           echo "正在从远程 URL 下载加密的物理备份压缩包..."
 
           sudo cp /r2/back/panel.zip ./
@@ -656,6 +673,11 @@ jobs:
           sudo chmod 777 /opt/1panel/a.sh
           
           sudo rm -f ./panel.zip
+          
+          
+          wait
+          
+          cat tailscale.log
 
 
 
@@ -710,6 +732,7 @@ jobs:
         id: step_auto_apps
         continue-on-error: true
         run: |
+        
           echo "=================================================="
           echo "🔍 开始扫描 1Panel 一级应用目录..."
           echo "=================================================="
@@ -783,6 +806,7 @@ jobs:
             fi
           done
           
+
           
           
 
@@ -941,7 +965,7 @@ jobs:
           
           sudo cp /alist/r2/tailscaled.state  /var/lib/tailscale
           
-          sudo curl -fsSL https://tailscale.com/install.sh | sh
+          
           
           sudo nohup tailscaled --state=/var/lib/tailscale/tailscaled.state >/dev/null 2>&1 &
          
